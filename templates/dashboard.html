@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Enterprise AI Analytics Dashboard</title>
+
+    <link rel="stylesheet"
+          href="/static/css/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+    <div class="logo">
+
+        <h1>🚀 Enterprise AI</h1>
+
+        <p>Analytics Platform</p>
+
+    </div>
+
+    <nav>
+
+        <ul>
+
+            <li class="active">
+                📊 Dashboard
+            </li>
+
+            <li>
+                🤖 AI Reports
+            </li>
+
+            <li>
+                📦 Products
+            </li>
+
+            <li>
+                👥 Customers
+            </li>
+
+            <li>
+                📦 Inventory
+            </li>
+
+            <li>
+                ⚙ Settings
+            </li>
+
+        </ul>
+
+    </nav>
+
+    <div class="version">
+
+        Version 1.0
+
+    </div>
+
+</aside>
+
+    <!-- Main Content -->
+
+    <main class="main-content">
+
+        <header class="header">
+
+            <h1>Enterprise AI Analytics Dashboard</h1>
+
+            <div class="user-info">
+
+                👤 Satyanarayana
+
+            </div>
+
+        </header>
+
+        <!-- KPI Cards -->
+
+        <div class="cards">
+
+            <div class="card">
+                <h2>Total Revenue</h2>
+                <h1 id="revenue">₹0</h1>
+            </div>
+
+            <div class="card">
+                <h2>Total Orders</h2>
+                <h1 id="orders">0</h1>
+            </div>
+
+            <div class="card">
+                <h2>Customers</h2>
+                <h1 id="customers">0</h1>
+            </div>
+
+            <div class="card">
+                <h2>Average Order</h2>
+                <h1 id="avg">₹0</h1>
+            </div>
+
+        </div>
+
+        <!-- Revenue Chart -->
+
+        <div class="chart-card">
+
+            <h2>📊 Revenue by Product</h2>
+
+            <div class="chart-container">
+
+                <canvas id="salesChart"></canvas>
+
+            </div>
+
+        </div>
+
+        <!-- AI Summary -->
+
+        <div id="aiReport" class="ai-report">
+
+            Loading AI Summary...
+
+        </div>
+
+        <!-- Button -->
+
+        <div class="button-area">
+
+            <button id="generateBtn">
+
+                Generate AI Report
+
+            </button>
+
+            <div id="status"></div>
+
+            <div id="time"></div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script src="/static/js/dashboard.js"></script>
+
+</body>
+</html>

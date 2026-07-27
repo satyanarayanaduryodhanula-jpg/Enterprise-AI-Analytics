@@ -1,0 +1,389 @@
+/* =========================================
+   Global Settings
+========================================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    background:#eef2f7;
+}
+
+/* =========================================
+   Main Layout
+========================================= */
+
+.layout{
+    display:flex;
+    min-height:100vh;
+}
+
+/* =========================================
+   Sidebar
+========================================= */
+
+.sidebar{
+
+    width:240px;
+
+    background:#1e3a8a;
+
+    color:white;
+
+    padding:30px 20px;
+
+}
+.logo{
+
+    text-align:center;
+
+    margin-bottom:40px;
+
+}
+
+.logo h1{
+
+    font-size:28px;
+
+    font-weight:bold;
+
+    margin-bottom:8px;
+
+}
+
+.logo p{
+
+    font-size:15px;
+
+    color:#cbd5e1;
+
+}
+
+.sidebar ul{
+
+    list-style:none;
+
+}
+
+.sidebar li{
+
+    padding:15px 20px;
+
+    margin-bottom:12px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-size:17px;
+
+    transition:.3s;
+
+}
+
+.sidebar li:hover{
+
+    background:#3b82f6;
+
+    transform:translateX(5px);
+
+}
+
+/* =========================================
+   Main Content
+========================================= */
+
+.main-content{
+
+    flex:1;
+
+    padding:30px;
+
+}
+
+/* =========================================
+   Header
+========================================= */
+
+.header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:30px;
+
+}
+
+.header h1{
+
+    color:#1e3a8a;
+
+}
+
+.user-info{
+
+    background:white;
+
+    padding:10px 20px;
+
+    border-radius:8px;
+
+    box-shadow:0 4px 10px rgba(0,0,0,.15);
+
+}
+
+/* =========================================
+   KPI Cards
+========================================= */
+
+.cards{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:20px;
+
+}
+
+.card{
+
+    background:white;
+
+    padding:25px;
+
+    text-align:center;
+
+    border-radius:12px;
+
+    box-shadow:0 4px 10px rgba(0,0,0,.15);
+
+    transition:.3s;
+
+}
+
+.card:hover{
+
+    transform:translateY(-5px);
+
+}
+
+.card h2{
+
+    color:#2563eb;
+
+    margin-bottom:15px;
+
+    font-size:18px;
+
+}
+
+.card h1{
+
+    color:#1e3a8a;
+
+}
+
+/* =========================================
+   Chart
+========================================= */
+
+.chart-card{
+
+    background:white;
+
+    margin-top:30px;
+
+    padding:25px;
+
+    border-radius:12px;
+
+    box-shadow:0 4px 10px rgba(0,0,0,.15);
+
+}
+
+.chart-card h2{
+
+    text-align:center;
+
+    color:#2563eb;
+
+    margin-bottom:20px;
+
+}
+
+.chart-container{
+
+    position:relative;
+
+    height:380px;
+
+}
+
+/* =========================================
+   AI Summary
+========================================= */
+
+.ai-report{
+
+    background:white;
+
+    margin-top:30px;
+
+    padding:25px;
+
+    border-radius:12px;
+
+    box-shadow:0 4px 10px rgba(0,0,0,.15);
+
+}
+
+.ai-report h2{
+
+    color:#2563eb;
+
+    margin-bottom:20px;
+
+}
+
+.ai-report p{
+
+    margin:15px 0;
+
+    line-height:1.7;
+
+}
+
+/* =========================================
+   Button
+========================================= */
+
+.button-area{
+
+    text-align:center;
+
+    margin-top:30px;
+
+}
+
+button{
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    padding:15px 40px;
+
+    font-size:18px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+button:hover{
+
+    background:#1d4ed8;
+
+}
+
+button:disabled{
+
+    background:gray;
+
+}
+
+#status{
+
+    margin-top:20px;
+
+    color:green;
+
+    font-weight:bold;
+
+}
+
+#time{
+
+    margin-top:10px;
+
+    color:gray;
+
+}
+
+/* =========================================
+   Responsive Design
+========================================= */
+
+@media(max-width:1000px){
+
+    .layout{
+
+        flex-direction:column;
+
+    }
+
+    .sidebar{
+
+        width:100%;
+
+    }
+
+    .cards{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+}
+
+@media(max-width:650px){
+
+    .cards{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .header{
+
+        flex-direction:column;
+
+        gap:15px;
+
+        text-align:center;
+
+    }
+
+}
+.active{
+
+    background:#2563eb;
+
+    font-weight:bold;
+
+}
+
+.version{
+
+    margin-top:80px;
+
+    text-align:center;
+
+    color:#cbd5e1;
+
+    font-size:14px;
+
+}

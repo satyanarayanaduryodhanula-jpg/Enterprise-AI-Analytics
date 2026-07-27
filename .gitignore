@@ -1,10 +1,12 @@
+# Environment Variables
+.env
+
 # Python
 __pycache__/
 *.pyc
 
 # Virtual Environments
 venv/
-.env
 
 # VS Code
 .vscode/
@@ -17,3 +19,5 @@ Thumbs.db
 
 # macOS
 .DS_Store
+# Generated AI Reports
+ai/reports/*.pdf
