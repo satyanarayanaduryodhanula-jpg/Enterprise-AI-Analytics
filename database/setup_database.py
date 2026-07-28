@@ -1,240 +1,337 @@
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 import psycopg2
 
-HOST = "localhost"
-USER = "postgres"
-PASSWORD = "saibaba"
-DATABASE = "enterprise_analytics"
 
-# -----------------------------------
-# STEP 1 : Connect to PostgreSQL
-# -----------------------------------
+# ==========================================
+# Load Environment Variables
+# ==========================================
 
-connection = psycopg2.connect(
-    host=HOST,
-    database="postgres",
-    user=USER,
-    password=PASSWORD
-)
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-connection.autocommit = True
-cursor = connection.cursor()
+load_dotenv(BASE_DIR / ".env", override=True)
 
-# -----------------------------------
-# STEP 2 : Create Database If Needed
-# -----------------------------------
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-cursor.execute("""
-SELECT 1
-FROM pg_database
-WHERE datname=%s
-""", (DATABASE,))
+if not DATABASE_URL:
+    raise ValueError(
+        "DATABASE_URL is missing. Check your .env file."
+    )
 
-if cursor.fetchone() is None:
-    cursor.execute(f"CREATE DATABASE {DATABASE}")
-    print("Database Created")
-else:
-    print("Database Already Exists")
 
-cursor.close()
-connection.close()
+# ==========================================
+# Connect to PostgreSQL
+# ==========================================
 
-# -----------------------------------
-# STEP 3 : Connect to Enterprise Database
-# -----------------------------------
+print("Connecting to PostgreSQL...")
 
-connection = psycopg2.connect(
-    host=HOST,
-    database=DATABASE,
-    user=USER,
-    password=PASSWORD
-)
+connection = psycopg2.connect(DATABASE_URL)
 
 cursor = connection.cursor()
 
-# -----------------------------------
-# STEP 4 : Create Tables
-# -----------------------------------
+print("Database connected successfully.")
+
+
+# ==========================================
+# Create Products Table
+# ==========================================
 
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS products(
+CREATE TABLE IF NOT EXISTS products (
     product_id SERIAL PRIMARY KEY,
-    product_name VARCHAR(100),
+    product_name VARCHAR(100) NOT NULL,
     category VARCHAR(100),
-    price DECIMAL(10,2),
-    stock INT
+    price DECIMAL(10,2) NOT NULL,
+    stock INT DEFAULT 0
 )
 """)
 
+
+# ==========================================
+# Create Customers Table
+# ==========================================
+
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS customers(
+CREATE TABLE IF NOT EXISTS customers (
     customer_id SERIAL PRIMARY KEY,
-    customer_name VARCHAR(100),
+    customer_name VARCHAR(100) NOT NULL,
     email VARCHAR(150),
     phone VARCHAR(20),
     city VARCHAR(100)
 )
 """)
 
+
+# ==========================================
+# Create Orders Table
+# ==========================================
+
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS orders(
+CREATE TABLE IF NOT EXISTS orders (
     order_id SERIAL PRIMARY KEY,
+
     customer_id INT REFERENCES customers(customer_id),
+
     product_id INT REFERENCES products(product_id),
-    quantity INT,
-    order_date DATE
+
+    quantity INT NOT NULL,
+
+    order_date DATE NOT NULL
 )
 """)
 
+
+# ==========================================
+# Create Inventory Table
+# ==========================================
+
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS inventory(
+CREATE TABLE IF NOT EXISTS inventory (
     inventory_id SERIAL PRIMARY KEY,
+
     product_id INT REFERENCES products(product_id),
-    available_stock INT
+
+    available_stock INT DEFAULT 0
 )
 """)
+
+
+# ==========================================
+# Create AI Insights Table
+# ==========================================
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS ai_insights (
+    id SERIAL PRIMARY KEY,
+
+    generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    business_health INT,
+
+    best_product VARCHAR(100),
+
+    worst_product VARCHAR(100),
+
+    total_revenue DECIMAL(15,2),
+
+    average_revenue DECIMAL(15,2),
+
+    inventory_risk TEXT,
+
+    recommendation TEXT
+)
+""")
+
 
 connection.commit()
 
-print("Tables Created Successfully")
+print("All tables created successfully.")
 
-# -----------------------------------
-# STEP 5 : Insert Products
-# -----------------------------------
+
+# ==========================================
+# Insert Products
+# ==========================================
 
 cursor.execute("SELECT COUNT(*) FROM products")
-count = cursor.fetchone()[0]
 
-if count == 0:
+product_count = cursor.fetchone()[0]
+
+if product_count == 0:
 
     products = [
-        ("Laptop","Electronics",65000,20),
-        ("Mouse","Electronics",600,150),
-        ("Keyboard","Electronics",1800,70),
-        ("Monitor","Electronics",15000,25),
-        ("Headphones","Electronics",2500,80),
-        ("Printer","Electronics",12000,15),
-        ("Tablet","Electronics",30000,30),
-        ("Mobile Phone","Electronics",45000,40),
-        ("Smart Watch","Electronics",12000,35),
-        ("Speaker","Electronics",3500,60)
+        ("Laptop", "Electronics", 65000, 20),
+        ("Mouse", "Electronics", 600, 150),
+        ("Keyboard", "Electronics", 1800, 70),
+        ("Monitor", "Electronics", 15000, 25),
+        ("Headphones", "Electronics", 2500, 80),
+        ("Printer", "Electronics", 12000, 15),
+        ("Tablet", "Electronics", 30000, 30),
+        ("Mobile Phone", "Electronics", 45000, 40),
+        ("Smart Watch", "Electronics", 12000, 35),
+        ("Speaker", "Electronics", 3500, 60)
     ]
 
     cursor.executemany("""
-    INSERT INTO products
-    (product_name,category,price,stock)
-    VALUES(%s,%s,%s,%s)
+        INSERT INTO products
+        (
+            product_name,
+            category,
+            price,
+            stock
+        )
+        VALUES (%s, %s, %s, %s)
     """, products)
 
-    print("Products Inserted")
+    print("Products inserted.")
 
-# -----------------------------------
-# STEP 6 : Insert Customers
-# -----------------------------------
+else:
+
+    print("Products already exist.")
+
+
+# ==========================================
+# Insert Customers
+# ==========================================
 
 cursor.execute("SELECT COUNT(*) FROM customers")
-count = cursor.fetchone()[0]
 
-if count == 0:
+customer_count = cursor.fetchone()[0]
+
+if customer_count == 0:
 
     customers = [
-        ("Rahul","rahul@gmail.com","9876543210","Hyderabad"),
-        ("Priya","priya@gmail.com","9876543211","Bangalore"),
-        ("Amit","amit@gmail.com","9876543212","Chennai"),
-        ("Sneha","sneha@gmail.com","9876543213","Mumbai"),
-        ("Ravi","ravi@gmail.com","9876543214","Delhi"),
-        ("Anjali","anjali@gmail.com","9876543215","Pune"),
-        ("Kiran","kiran@gmail.com","9876543216","Hyderabad"),
-        ("Deepak","deepak@gmail.com","9876543217","Kolkata"),
-        ("Neha","neha@gmail.com","9876543218","Jaipur"),
-        ("Arjun","arjun@gmail.com","9876543219","Visakhapatnam")
+        ("Rahul", "rahul@gmail.com", "9876543210", "Hyderabad"),
+        ("Priya", "priya@gmail.com", "9876543211", "Bangalore"),
+        ("Amit", "amit@gmail.com", "9876543212", "Chennai"),
+        ("Sneha", "sneha@gmail.com", "9876543213", "Mumbai"),
+        ("Ravi", "ravi@gmail.com", "9876543214", "Delhi"),
+        ("Anjali", "anjali@gmail.com", "9876543215", "Pune"),
+        ("Kiran", "kiran@gmail.com", "9876543216", "Hyderabad"),
+        ("Deepak", "deepak@gmail.com", "9876543217", "Kolkata"),
+        ("Neha", "neha@gmail.com", "9876543218", "Jaipur"),
+        ("Arjun", "arjun@gmail.com", "9876543219", "Visakhapatnam")
     ]
 
     cursor.executemany("""
-    INSERT INTO customers
-    (customer_name,email,phone,city)
-    VALUES(%s,%s,%s,%s)
+        INSERT INTO customers
+        (
+            customer_name,
+            email,
+            phone,
+            city
+        )
+        VALUES (%s, %s, %s, %s)
     """, customers)
 
-    print("Customers Inserted")
+    print("Customers inserted.")
 
-# -----------------------------------
-# STEP 7 : Insert Orders
-# -----------------------------------
+else:
+
+    print("Customers already exist.")
+
+
+# ==========================================
+# Insert Orders
+# ==========================================
 
 cursor.execute("SELECT COUNT(*) FROM orders")
-count = cursor.fetchone()[0]
 
-if count == 0:
+order_count = cursor.fetchone()[0]
+
+if order_count == 0:
 
     orders = [
-        (1,1,1,'2026-07-01'),
-        (2,3,2,'2026-07-02'),
-        (3,2,1,'2026-07-02'),
-        (4,5,3,'2026-07-03'),
-        (5,4,1,'2026-07-03'),
-        (6,6,2,'2026-07-04'),
-        (7,7,1,'2026-07-05'),
-        (8,8,2,'2026-07-06'),
-        (9,9,1,'2026-07-07'),
-        (10,10,2,'2026-07-08'),
-        (1,2,5,'2026-07-09'),
-        (2,1,1,'2026-07-10'),
-        (3,5,2,'2026-07-11'),
-        (4,7,1,'2026-07-12'),
-        (5,8,2,'2026-07-13')
+        (1, 1, 1, "2026-07-01"),
+        (2, 3, 2, "2026-07-02"),
+        (3, 2, 1, "2026-07-02"),
+        (4, 5, 3, "2026-07-03"),
+        (5, 4, 1, "2026-07-03"),
+        (6, 6, 2, "2026-07-04"),
+        (7, 7, 1, "2026-07-05"),
+        (8, 8, 2, "2026-07-06"),
+        (9, 9, 1, "2026-07-07"),
+        (10, 10, 2, "2026-07-08"),
+        (1, 2, 5, "2026-07-09"),
+        (2, 1, 1, "2026-07-10"),
+        (3, 5, 2, "2026-07-11"),
+        (4, 7, 1, "2026-07-12"),
+        (5, 8, 2, "2026-07-13")
     ]
 
     cursor.executemany("""
-    INSERT INTO orders
-    (customer_id,product_id,quantity,order_date)
-    VALUES(%s,%s,%s,%s)
+        INSERT INTO orders
+        (
+            customer_id,
+            product_id,
+            quantity,
+            order_date
+        )
+        VALUES (%s, %s, %s, %s)
     """, orders)
 
-    print("Orders Inserted")
+    print("Orders inserted.")
 
-# -----------------------------------
-# STEP 8 : Insert Inventory
-# -----------------------------------
+else:
+
+    print("Orders already exist.")
+
+
+# ==========================================
+# Insert Inventory
+# ==========================================
 
 cursor.execute("SELECT COUNT(*) FROM inventory")
-count = cursor.fetchone()[0]
 
-if count == 0:
+inventory_count = cursor.fetchone()[0]
+
+if inventory_count == 0:
 
     inventory = [
-        (1,20),
-        (2,150),
-        (3,70),
-        (4,25),
-        (5,80),
-        (6,15),
-        (7,30),
-        (8,40),
-        (9,35),
-        (10,60)
+        (1, 20),
+        (2, 150),
+        (3, 70),
+        (4, 25),
+        (5, 80),
+        (6, 15),
+        (7, 30),
+        (8, 40),
+        (9, 35),
+        (10, 60)
     ]
 
     cursor.executemany("""
-    INSERT INTO inventory
-    (product_id,available_stock)
-    VALUES(%s,%s)
+        INSERT INTO inventory
+        (
+            product_id,
+            available_stock
+        )
+        VALUES (%s, %s)
     """, inventory)
 
-    print("Inventory Inserted")
+    print("Inventory inserted.")
 
-# -----------------------------------
-# STEP 9 : Save Everything
-# -----------------------------------
+else:
+
+    print("Inventory already exists.")
+
 
 connection.commit()
 
-print("\n===================================")
-print("Enterprise Database Ready")
-print("Products      : OK")
-print("Customers     : OK")
-print("Orders        : OK")
-print("Inventory     : OK")
-print("===================================")
+
+# ==========================================
+# Verify Database
+# ==========================================
+
+cursor.execute("SELECT COUNT(*) FROM products")
+products_total = cursor.fetchone()[0]
+
+cursor.execute("SELECT COUNT(*) FROM customers")
+customers_total = cursor.fetchone()[0]
+
+cursor.execute("SELECT COUNT(*) FROM orders")
+orders_total = cursor.fetchone()[0]
+
+cursor.execute("SELECT COUNT(*) FROM inventory")
+inventory_total = cursor.fetchone()[0]
+
+cursor.execute("SELECT COUNT(*) FROM ai_insights")
+ai_total = cursor.fetchone()[0]
+
+
+print("\n======================================")
+print("Enterprise Cloud Database Ready")
+print("======================================")
+print("Products     :", products_total)
+print("Customers    :", customers_total)
+print("Orders       :", orders_total)
+print("Inventory    :", inventory_total)
+print("AI Insights  :", ai_total)
+print("======================================")
+
 
 cursor.close()
 connection.close()
+
+print("Database connection closed.")
